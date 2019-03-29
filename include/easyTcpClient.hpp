@@ -17,11 +17,13 @@ class tcp_client
 
     void send(std::string msg);
     std::string receive(int maxSize=1024);
-
-    template <class T> T freceive(int maxSize=1024);
+    bool get_connect_status(){return connected;}
 
     static int nb_client;
-    
+
+  protected:
+    //template <class T> T freceive(int maxSize=1024);
+
   private:
 
     std::string remote_ip_addr;
@@ -35,6 +37,7 @@ class tcp_client
     bool to_send;
 
     std::queue<std::string> reception_buffer;
+    //template<class T> std::queue<T> formatted_buffer_queue;
 
 
 

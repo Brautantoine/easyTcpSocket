@@ -1,3 +1,3 @@
 #include "easyTcpClient.hpp"
 
-nb_client=0;
+static int nb_client=0;
