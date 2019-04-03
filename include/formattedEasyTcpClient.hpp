@@ -1,6 +1,8 @@
 #ifndef FORMATTEDEASYTCPCLIENT
 #define FORMATTEDEASYTCPCLIENT
 
+//** WIP DONT USE IT **//
+
 #include "easyTcpClient.hpp"
 #include <string>
 #include <thread>
@@ -14,6 +16,7 @@ class ftcp_client : public tcp_client
     ftcp_client(std::string ip_addr,int port_number);
     virtual ~ftcp_client();
 
+    T receive(int maxSize=1024){return freceive(maxSize);}
     T freceive(int maxSize=1024);
 
   protected:
