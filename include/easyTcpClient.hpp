@@ -1,9 +1,12 @@
 #ifndef EASYTCPCLIENT
 #define EASYTCPCLIENT
 
+//** WIP DONT USE IT **//
+
 #include <string>
 #include <thread>
 #include <queue>
+#include <mutex>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -20,20 +23,20 @@ class tcp_client
     tcp_client(std::string ip_addr,int port_number);
     virtual ~tcp_client();
 
-    void connect_to_remote();
+
     void connect_to_remote(std::string ip_addr,int port_number);
     void disconnect();
 
     // Basic methods
-    virtual void send(std::string msg);
+    virtual void Send(std::string msg);
     std::string receive(int maxSize=102);
 
-    // Advanced reception methods
+    // Advanced methods
+    virtual void Send(std::string msg, int timeout);
     void start_bufferized_reception();
     void stop_bufferized_reception();
-    std::string get_first();
-    std::string get_last();
-    std::string clean_buffer();
+    std::string get_message();
+    void clean_rx_buffer(){clear_queue(reception_buffer);}
     bool buffer_empty(){return reception_buffer.empty();}
     std::queue<std::string> get_buffer(){return reception_buffer;}
 
@@ -50,7 +53,12 @@ class tcp_client
 
   private:
 
+    void connect_to_remote();
+
     void kill_thread();
+
+    void sender_loop();
+    void receiver_loop();
 
     int tcp_socket;
     std::string remote_ip_addr;
@@ -59,6 +67,8 @@ class tcp_client
     std::thread sender_task;
     std::thread receiver_task;
 
+    std::unique_lock<std::mutex> tx_lock;
+
     //bool connected;
     bool sender_alive;
     bool receiver_alive;
@@ -66,6 +76,8 @@ class tcp_client
 
     std::queue<std::string> reception_buffer;
     std::queue<std::string> emmission_buffer;
+
+    void clear_queue(std::queue<std::string>& q){std::queue<std::string> n;std::swap(q,n);}
 };
 
 #endif // EASYTCPCLIENT

@@ -2,10 +2,9 @@ CXX ?= g++
 
 # path #
 SRC_PATH = src
-BUILD_PATH = build
+BUILD_PATH = _build
 BIN_PATH = $(BUILD_PATH)/bin
 INSTALL_LOC ?= /usr/bin
-RESSOURCES_DEST ?= /usr/share/klt
 CURRENT_DIR = $(shell pwd)
 
 # executable #
@@ -25,7 +24,7 @@ OBJECTS = $(SOURCES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 DEPS = $(OBJECTS:.o=.d)
 
 # flags #
-COMPILE_FLAGS = -std=c++11 -Wall -Wextra 
+COMPILE_FLAGS = -std=c++11 -Wall -Wextra
 INCLUDES = -I include/ -I /usr/local/include
 # Space-separated pkg-config libraries used by this project
 LIBS =
