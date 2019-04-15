@@ -8,13 +8,15 @@
 #include <queue>
 #include <mutex>
 
+#include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
-#define UNBINDED_SOCKET 1
+#define UNBINDED_SOCKET -1
 
 class tcp_client
 {
@@ -29,10 +31,11 @@ class tcp_client
 
     // Basic methods
     virtual void Send(std::string msg);
-    std::string receive(int maxSize=102);
+    std::string receive(int maxSize=1024);
 
     // Advanced methods
-    virtual void Send(std::string msg, int timeout);
+    //virtual void Send(std::string msg, int timeout);
+    void force_disconnect();
     void start_bufferized_reception();
     void stop_bufferized_reception();
     std::string get_message();
