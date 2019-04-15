@@ -1,8 +1,6 @@
 #ifndef EASYTCPCLIENT
 #define EASYTCPCLIENT
 
-//** WIP DONT USE IT **//
-
 #include <string>
 #include <thread>
 #include <queue>
@@ -15,6 +13,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <cstring>
 
 #define UNBINDED_SOCKET -1
 
@@ -27,32 +26,31 @@ class tcp_client
 
 
     void connect_to_remote(std::string ip_addr,int port_number);
-    void disconnect();
+    void Disconnect();
 
     // Basic methods
     virtual void Send(std::string msg);
-    std::string receive(int maxSize=1024);
+    std::string Receive(int maxSize=1024);
 
-    // Advanced methods
-    //virtual void Send(std::string msg, int timeout);
-    void force_disconnect();
-    void start_bufferized_reception();
-    void stop_bufferized_reception();
-    std::string get_message();
-    void clean_rx_buffer(){clear_queue(reception_buffer);}
-    bool buffer_empty(){return reception_buffer.empty();}
-    std::queue<std::string> get_buffer(){return reception_buffer;}
+    // Advanced methods - WIP
+    //void force_disconnect();
+    //void start_bufferized_reception();
+    //void stop_bufferized_reception();
+    //std::string get_message();
+    //void clean_rx_buffer(){clear_queue(reception_buffer);}
+    //bool buffer_empty(){return reception_buffer.empty();}
+    //std::queue<std::string> get_buffer(){return reception_buffer;}
 
     // Status methods
     bool get_connect_status(){return sender_alive;}
-    std::string get_remote_ip();
-    int get_remote_port();
+    std::string get_remote_ip(){return remote_ip_addr;}
+    int get_remote_port(){return remote_port_number;}
 
     static int nb_client;
     static int get_nb_client(){return nb_client;}
 
   protected:
-    //template <class T> T freceive(int maxSize=1024);
+    //
 
   private:
 
@@ -72,10 +70,8 @@ class tcp_client
 
     std::unique_lock<std::mutex> tx_lock;
 
-    //bool connected;
     bool sender_alive;
     bool receiver_alive;
-    //bool to_send;
 
     std::queue<std::string> reception_buffer;
     std::queue<std::string> emmission_buffer;

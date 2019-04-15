@@ -8,8 +8,7 @@ int main()
   {
     std::cin >> msg;
     tcp.Send(msg);
+    std::cout << tcp.Receive() << '\n';
   }
-
-  //while(1);
   return 0;
 }
