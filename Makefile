@@ -8,7 +8,7 @@ INSTALL_LOC ?= /usr/bin
 CURRENT_DIR = $(shell pwd)
 
 # executable #
-BIN_NAME = tcpExample.out
+BIN_NAME = libtcp.so
 
 # extensions #
 SRC_EXT = cpp
@@ -24,10 +24,11 @@ OBJECTS = $(SOURCES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 DEPS = $(OBJECTS:.o=.d)
 
 # flags #
-COMPILE_FLAGS = -std=c++11 -Wall -Wextra
+COMPILE_FLAGS = -std=c++11 -Wall -Wextra -fPIC
 INCLUDES = -I include/ -I /usr/local/include
 # Space-separated pkg-config libraries used by this project
 LIBS = -lpthread
+LD_FLAGS= --shared
 
 .PHONY: default_target
 default_target: release
@@ -54,14 +55,12 @@ clean:
 # checks the executable and symlinks to the output
 .PHONY: all
 all: $(BIN_PATH)/$(BIN_NAME)
-	@echo "Making symlink: $(BIN_NAME) -> $<"
-	@$(RM) $(BIN_NAME)
-	@ln -s $(BIN_PATH)/$(BIN_NAME) $(BIN_NAME)
+	
 
 # Creation of the executable
 $(BIN_PATH)/$(BIN_NAME): $(OBJECTS)
 	@echo "	LD $@"
-	@$(CXX) $(OBJECTS) -o $@ $(LIBS)
+	@$(CXX) $(LD_FLAGS) $(OBJECTS) -o $@ $(LIBS)
 
 # Add dependency files, if they exist
 -include $(DEPS)
