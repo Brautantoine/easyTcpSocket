@@ -82,9 +82,9 @@ void tcp_client::connect_to_remote(std::string ip_addr,int port_number)
 
 void tcp_client::Send(std::string msg)
 {
-  //tx_lock.lock();
+  std::unique_lock<std::mutex> lock(tx_lock);
   emmission_buffer.emplace(msg);
-  //tx_lock.unlock();
+  lock.unlock();
 }
 
 void tcp_client::sender_loop()
@@ -96,10 +96,10 @@ void tcp_client::sender_loop()
     {
       std::string buffer;
 
-      //tx_lock.lock();
+      std::unique_lock<std::mutex> lock(tx_lock);
       buffer = emmission_buffer.front();
       emmission_buffer.pop();
-      //tx_lock.unlock();
+      lock.unlock();
       //std::cout << "sending ..." << '\n';
       if(send(tcp_socket, buffer.c_str(), buffer.size(), 0) < 0)
       {

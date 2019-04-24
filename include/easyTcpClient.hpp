@@ -68,7 +68,7 @@ class tcp_client
     std::thread sender_task;
     std::thread receiver_task;
 
-    std::unique_lock<std::mutex> tx_lock;
+    std::mutex tx_lock;
 
     bool sender_alive;
     bool receiver_alive;
