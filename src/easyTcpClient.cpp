@@ -63,7 +63,10 @@ void tcp_client::connect_to_remote()
       throw std::runtime_error("Error while connnecting to remote\n"); // To up
 
     sender_alive = true;
-    sender_task = std::thread(&tcp_client::sender_loop,this);
+    //sender_task = std::thread(&tcp_client::sender_loop,this);
+    auto temp = &unique_sender_task::get_instance();
+    sender = std::unique_ptr<unique_sender_task>(temp);
+    sender->init_thread();
     //std::cout << "connected" << '\n';
   }
 
@@ -82,12 +85,13 @@ void tcp_client::connect_to_remote(std::string ip_addr,int port_number)
 
 void tcp_client::Send(std::string msg)
 {
-  std::unique_lock<std::mutex> lock(tx_lock);
+  /*std::unique_lock<std::mutex> lock(tx_lock);
   emmission_buffer.emplace(msg);
-  lock.unlock();
+  lock.unlock();*/
+  sender->push_message(msg,tcp_socket,socket_lock);
 }
 
-void tcp_client::sender_loop()
+/*void tcp_client::sender_loop()
 {
   //std::cout << "thread started ..." << '\n';
   while(sender_alive)
@@ -107,21 +111,23 @@ void tcp_client::sender_loop()
       }
     }
   }
-}
+}*/
 
 void tcp_client::Disconnect()
 {
   kill_thread();
   close(tcp_socket);
+  tcp_socket = UNBINDED_SOCKET;
 }
 
 void tcp_client::kill_thread()
 {
   //std::cout << "disconnect" << '\n';
-  while(!emmission_buffer.empty());
+  /*while(!emmission_buffer.empty());
   sender_alive=false;
   receiver_alive=false;
-  sender_task.join();
+  sender_task.join();*/
+  sender->kill_thread();
   //receiver_task.join();
 }
 

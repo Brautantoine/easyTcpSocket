@@ -5,6 +5,8 @@
 #include <thread>
 #include <queue>
 #include <mutex>
+#include <atomic>
+#include <memory>
 
 #include <iostream>
 #include <sys/socket.h>
@@ -14,6 +16,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
+
+#include "uniquesendertask.hpp"
 
 #define UNBINDED_SOCKET -1
 
@@ -58,17 +62,20 @@ class tcp_client
 
     void kill_thread();
 
-    void sender_loop();
+    //void sender_loop();
     void receiver_loop();
 
-    int tcp_socket;
+    std::atomic_int tcp_socket;
     std::string remote_ip_addr;
     int remote_port_number;
 
-    std::thread sender_task;
+    //std::thread sender_task;
     std::thread receiver_task;
+    std::unique_ptr<unique_sender_task> sender;
 
     std::mutex tx_lock;
+    std::mutex socket_lock;
+    //std::mutex& tx_lock;
 
     bool sender_alive;
     bool receiver_alive;
