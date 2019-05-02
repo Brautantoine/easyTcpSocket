@@ -6,8 +6,8 @@ tcp_client::tcp_client()
 {
   //std::cout << "constructor ..." << '\n';
   tcp_socket=UNBINDED_SOCKET;
-  sender_alive = false;
   receiver_alive = false;
+  connected = false;
 
   nb_client++;
 }
@@ -16,8 +16,8 @@ tcp_client::tcp_client(std::string ip_addr,int port_number)
   remote_ip_addr = ip_addr;
   remote_port_number = port_number;
   tcp_socket=UNBINDED_SOCKET;
-  sender_alive = false;
   receiver_alive = false;
+  connected = false;
   //std::cout << "advanced constructor ..." << '\n';
   connect_to_remote();
 }
@@ -62,11 +62,12 @@ void tcp_client::connect_to_remote()
     if (connect(tcp_socket, (struct sockaddr *)&server_info, sizeof(server_info)) == -1)
       throw std::runtime_error("Error while connnecting to remote\n"); // To up
 
-    sender_alive = true;
     //sender_task = std::thread(&tcp_client::sender_loop,this);
     auto temp = &unique_sender_task::get_instance();
     sender = std::unique_ptr<unique_sender_task>(temp);
     sender->init_thread();
+
+    connected = true;
     //std::cout << "connected" << '\n';
   }
 
@@ -88,7 +89,8 @@ void tcp_client::Send(std::string msg)
   /*std::unique_lock<std::mutex> lock(tx_lock);
   emmission_buffer.emplace(msg);
   lock.unlock();*/
-  sender->push_message(msg,tcp_socket,socket_lock);
+  if(connected)
+    sender->push_message(msg,tcp_socket,socket_lock);
 }
 
 /*void tcp_client::sender_loop()
@@ -115,9 +117,12 @@ void tcp_client::Send(std::string msg)
 
 void tcp_client::Disconnect()
 {
+  connected = false;
   kill_thread();
+  std::unique_lock<std::mutex> _sock_lock (socket_lock);
   close(tcp_socket);
   tcp_socket = UNBINDED_SOCKET;
+  _sock_lock.unlock();
 }
 
 void tcp_client::kill_thread()

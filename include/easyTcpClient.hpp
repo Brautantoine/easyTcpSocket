@@ -46,7 +46,7 @@ class tcp_client
     //std::queue<std::string> get_buffer(){return reception_buffer;}
 
     // Status methods
-    bool get_connect_status(){return sender_alive;}
+    bool get_connect_status(){return connected;}
     std::string get_remote_ip(){return remote_ip_addr;}
     int get_remote_port(){return remote_port_number;}
 
@@ -77,7 +77,7 @@ class tcp_client
     std::mutex socket_lock;
     //std::mutex& tx_lock;
 
-    bool sender_alive;
+    bool connected;
     bool receiver_alive;
 
     std::queue<std::string> reception_buffer;
