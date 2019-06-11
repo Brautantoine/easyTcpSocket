@@ -8,7 +8,11 @@
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <cstring>
+
+#include <iostream>
+#include <exception>
 
 namespace easyTCP
 {
@@ -18,6 +22,12 @@ namespace easyTCP
     std::string ip_addr;
     int readable;                                                               // Pseudo Semaphore
     std::queue<std::string> msg;
+    connectedClient(int _socket, std::string _ip)
+    {
+      socket = _socket;
+      ip_addr = _ip;
+      readable = 0;
+    }
   };
 
   const int MAXCONNECTIONS = 5;
@@ -37,8 +47,10 @@ class tcp_server
     void stop_server();
 
     void send_to_client(int socket, std::string msg);
+    void send_to_client(connectedClient client, std::string msg);
 
-    std::vector<connectedClient> get_client(){ return clientTable;}
+    std::vector<connectedClient>* get_client(){ return &clientTable;}
+    std::queue<connectedClient>* get_new_client_fifo(){ return &new_client_fifo;}
 
   protected:
     //
@@ -49,12 +61,17 @@ class tcp_server
     void _listen_for_client();
 
     std::vector<connectedClient> clientTable;
+    std::queue<connectedClient> new_client_fifo;
 
     std::string server_addr;
     int server_port;
     int server_socket;
 
     std::thread listener_task;
+    bool listener_task_alive;
+
+    struct sockaddr_in _server;
+    int length_sockadr;
 
 
 };
